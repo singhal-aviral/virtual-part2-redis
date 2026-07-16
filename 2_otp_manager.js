@@ -19,7 +19,7 @@ app.post("/createotp", async (req, res) => {
     const email = req.body.email;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await redis.set(`otp:email:${email}`, JSON.stringify(otp), "EX", 120)
+    await redis.set(`otp:email:${email}`, JSON.stringify(otp), "EX", 20)
     return res.status(200).json({
         msg: "your otp created successfully",
         otp: otp
@@ -34,13 +34,15 @@ app.post("/verifyotp", async (req, res) => {
     const storedOtp = JSON.parse(value);
 
     if(storedOtp == otp){
+        // we don't need this otp anymore, so can get rid of it
+        await redis.del(`otp:email:${email}`)
         return res.status(200).json({
             msg: "your otp is verified and valid"
         })
     }
 
     return res.status(400).json({
-        msg: "your otp is not valid"    
+        msg: "your otp is not valid or has expired"    
     })
 })
 
