@@ -17,7 +17,7 @@ app.use(express.json())
 // API 1: create temporary OTP and store it in redis. returns OTP to user
 app.post("/createotp", async (req, res) => {
     const email = req.body.email;
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await redis.set(`otp:email:${email}`, JSON.stringify(otp), "EX", 120)
     return res.status(200).json({
