@@ -1,3 +1,5 @@
+// INFO: this file handles the most basic function of redis - to do caching for data for any API
+
 import express from "express"
 import bcrypt from "bcrypt"
 import Redis from "ioredis"
@@ -11,7 +13,7 @@ import connectDB from "./database.js"
 const app = express()
 app.use(express.json())
 
-// API 1: 
+// API 1: get all users data - served from redis. if not redis, then served from DB
 app.get("/getusers", async  (req, res) => {     
     // get users from redis and if data retreived then convert to JSON objects
     const cached_users = await redis.get("users:all")
@@ -30,7 +32,7 @@ app.get("/getusers", async  (req, res) => {
    }) 
 })
 
-// API 2: 
+// API 2: create new user and refresh redis memory to prepare it for next GET call
 app.post("/createuser", async (req, res) => {
     const {name, email, password} = req.body;
     if(!name || !email || !password){
